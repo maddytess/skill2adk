@@ -1,0 +1,62 @@
+{
+  "guardrail_id":   "security.never_fabricate_iam_findings",
+  "name":           "Never fabricate IAM security findings",
+  "scope":          "domain",
+  "skill_id":       null,
+  "owner_agent_id": null,
+  "domain":         "security",
+  "tenant_id":      null,
+
+  "rules": [
+    {
+      "rule_id":     "no_skill_result_cross_inference",
+      "description": "Never use iam_security_audit findings (e.g. no wildcard policies, MFA enabled) to conclude that no privilege escalation paths exist, and never use iam_access_path findings to infer overall IAM hygiene. The two skills use fundamentally different analysis models: iam_security_audit checks static misconfigurations via iam:ListUsers/iam:GetPolicyVersion, while iam_access_path uses iam:SimulatePrincipalPolicy to evaluate transitive role-chaining reachability. A clean static audit does not rule out multi-hop escalation paths.",
+      "enforcement": "hard",
+      "action":      "block"
+    },
+    {
+      "rule_id":     "simulation_is_not_confirmed_exploit",
+      "description": "aws.analyze_iam_access_paths uses iam:SimulatePrincipalPolicy to compute theoretical privilege escalation reachability given current policy state. This is a simulation, not evidence of an active or historical exploit. Never present an escalation path as a confirmed attack or breach. If corroboration is needed, a separate cloudtrail_events query must be run to check whether the simulated path was actually traversed.",
+      "enforcement": "hard",
+      "action":      "block"
+    },
+    {
+      "rule_id":     "cloudtrail_one_event_name_per_step",
+      "description": "aws.query_cloudtrail_events calls cloudtrail:LookupEvents which accepts only one EventName attribute value per API call. Querying for multiple event types (e.g. StopInstances AND DeleteBucket) in a single step silently returns results for only the first event. Each event type requires a separate tool invocation. Never report 'no events found' for multiple event types from a single step — the absence of results may reflect the API constraint, not the actual event history.",
+      "enforcement": "hard",
+      "action":      "block"
+    },
+    {
+      "rule_id":     "no_cache_for_event_queries",
+      "description": "Both aws.query_cloudtrail_events and azure.query_activity_log are marked cacheable: false. Event query results must always reflect a live API call at investigation time. During an active security incident, serving a cached event list could hide actions taken after the cache was populated — for example, a privilege escalation or resource deletion that occurred after the last cached result.",
+      "enforcement": "hard",
+      "action":      "block"
+    },
+    {
+      "rule_id":     "no_cross_provider_iam_inference",
+      "description": "AWS IAM audit results (e.g. no users without MFA, no wildcard policies) must not be used to infer Azure RBAC posture, and vice versa. IAM and RBAC are entirely distinct permission models with different resource types, policy structures, and API surfaces. aws.audit_iam_security covers AWS::IAM::User/Role/Policy, while azure.audit_rbac_security covers Microsoft.Authorization/roleAssignments and Microsoft.KeyVault/vaults. Each provider requires its own dedicated tool run.",
+      "enforcement": "hard",
+      "action":      "block"
+    },
+    {
+      "rule_id":     "cross_account_trust_requires_verification",
+      "description": "Cross-account trust relationships surfaced by iam:GetRole trust policies may represent legitimate integrations — AWS Organizations service accounts, vendor tooling, or CI/CD pipelines with cross-account deploy roles. Do not automatically flag an external account ID in a trust policy as unauthorized access. Surface it as a finding requiring human review, and note that the trust relationship alone is not evidence of misuse without corroborating CloudTrail assume-role events.",
+      "enforcement": "soft",
+      "action":      "warn"
+    },
+    {
+      "rule_id":     "disclose_partial_audit_coverage",
+      "description": "In security.iam_security_audit, the audit_iam_roles step is required: false with on_failure: skip and on_partial_failure: continue. If this step was skipped or failed, role-level findings — wildcard admin role assignments, overly broad trust policies, and cross-account role exposure — will be absent from the report. Before presenting an overall IAM audit result, explicitly disclose whether the roles step completed. Do not summarize the audit as comprehensive if the roles inventory was not evaluated.",
+      "enforcement": "soft",
+      "action":      "warn"
+    },
+    {
+      "rule_id":     "activity_log_retention_boundary",
+      "description": "Azure Activity Log retains events for 90 days. A query with start_time older than 90 days from today will return empty results — this is a platform retention boundary, not evidence that no action occurred during that period. When the queried window exceeds the 90-day limit, warn the user that results are bounded by retention and that older events are no longer available via this tool. Do not report an empty result as a clean audit for that period.",
+      "enforcement": "soft",
+      "action":      "warn"
+    }
+  ],
+
+  "version": "0.1.0"
+}

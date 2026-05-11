@@ -1,0 +1,92 @@
+{
+  "skill_id":       "compliance.soc2_audit",
+  "display_name":   "SOC 2 Compliance Audit",
+  "owner_agent_id": "domain.compliance.audit",
+  "capability_id":  "run_soc2_audit",
+  "domain":         "compliance",
+  "tier":           "basic",
+  "status":         "active",
+  "tenant_id":      null,
+
+  "purpose":     "Run a SOC 2 Trust Service Criteria compliance audit against the AWS or Azure cloud environment.",
+  "description": "Evaluates the cloud environment against SOC 2 Trust Service Criteria. Use ONLY for SOC 2 compliance requests. Not for ISO 27001, HIPAA, GDPR, or PCI audits.",
+
+  "capabilities": [
+    "evaluate AWS infrastructure against SOC 2 Trust Service Criteria",
+    "evaluate Azure infrastructure against SOC 2 compliance controls",
+    "produce structured compliance report with per-control pass/fail status",
+    "surface remediation steps for failing SOC 2 controls"
+  ],
+
+  "context_descriptions": [
+    "account scope — AWS profile or Azure subscription-name to audit",
+    "compliance framework — SOC 2 Trust Service Criteria control set"
+  ],
+
+  "supported_context_types": [
+    "account_scope",
+    "compliance_framework"
+  ],
+
+  "tool_affinity": {
+    "allowed_tool_classes": ["compliance_read"],
+    "preferred_tool_tags":  ["soc2", "compliance", "audit", "security", "trust"],
+    "execution_locations":  ["client"]
+  },
+
+  "context": {
+    "merge_strategy":      "union",
+    "dedupe_keys":         ["account_scope"],
+    "max_parallel":        2,
+    "on_missing_required": "request_more"
+  },
+
+  "execution_plan": {
+    "steps": [
+      {
+        "step_id":      "run_soc2_checks",
+        "context_type": "compliance_framework",
+        "tool_class":   "compliance_read",
+        "depends_on":   [],
+        "required":     true,
+        "on_failure":   "stop"
+      }
+    ],
+    "on_partial_failure": "fail"
+  },
+
+  "output_type":       "compliance_report",
+  "output_schema_ref": "schemas/compliance_report.yaml",
+
+  "client_action_type": "audit",
+
+  "tool_ids": [
+    "aws.run_soc2_audit",
+    "azure.run_soc2_audit"
+  ],
+
+  "artifact_effects": {
+    "can_create": ["compliance_report"],
+    "can_update": [],
+    "can_enrich": ["finding"]
+  },
+
+  "action_semantics": {
+    "can_request_execution":            false,
+    "can_generate_plan_fragments":      false,
+    "can_generate_bundle_hints":        false,
+    "can_generate_playbook_candidates": true
+  },
+
+  "safety": {
+    "safety_class":              "advisory",
+    "requires_human_review_for": []
+  },
+
+  "evidence": {
+    "emits_rationale":  true,
+    "emits_confidence": true
+  },
+
+  "version": "0.1.0"
+}

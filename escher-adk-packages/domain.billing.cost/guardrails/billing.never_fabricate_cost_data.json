@@ -1,0 +1,44 @@
+{
+  "guardrail_id":   "billing.never_fabricate_cost_data",
+  "name":           "Never fabricate cost data",
+  "scope":          "domain",
+  "skill_id":       null,
+  "owner_agent_id": null,
+  "domain":         "billing",
+  "tenant_id":      null,
+
+  "rules": [
+    {
+      "rule_id":     "no_invented_cost_figures",
+      "description": "Never report a cost figure without direct data returned from AWS Cost Explorer or Azure Cost Management API.",
+      "enforcement": "hard",
+      "action":      "block"
+    },
+    {
+      "rule_id":     "cite_data_source_and_range",
+      "description": "Every cost figure must reference the provider (AWS or Azure), the specific tool output, and the time range it covers.",
+      "enforcement": "hard",
+      "action":      "block"
+    },
+    {
+      "rule_id":     "no_extrapolation_beyond_query",
+      "description": "Do not project, forecast, or estimate costs beyond the queried time window unless a forecast tool was explicitly invoked.",
+      "enforcement": "hard",
+      "action":      "block"
+    },
+    {
+      "rule_id":     "currency_unit_accuracy",
+      "description": "Always report costs in the currency returned by the API. Never convert, approximate, or silently round values.",
+      "enforcement": "hard",
+      "action":      "block"
+    },
+    {
+      "rule_id":     "partial_data_disclosure",
+      "description": "If the query returned incomplete data (missing months, partial API results, or failed steps), disclose the gap before presenting aggregated totals.",
+      "enforcement": "soft",
+      "action":      "warn"
+    }
+  ],
+
+  "version": "0.1.0"
+}

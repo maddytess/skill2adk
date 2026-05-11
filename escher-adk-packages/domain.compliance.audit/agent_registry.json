@@ -1,0 +1,49 @@
+{
+  "agent_id":     "domain.compliance.audit",
+  "name":         "compliance-audit-agent",
+  "display_name": "Cloud Compliance Audit Agent",
+  "agent_type":   "domain",
+  "domain":       "compliance",
+  "tier_support": ["basic", "advanced"],
+  "status":       "active",
+  "tenant_id":    null,
+
+  "purpose": "Run multi-framework compliance audits (SOC 2, GDPR, HIPAA, ISO 27001, PCI-DSS) across AWS and Azure cloud infrastructure.",
+  "description": "Compliance agent covering SOC 2, GDPR, HIPAA, ISO 27001, and PCI-DSS v4.0 audits across AWS and Azure. Evaluates cloud infrastructure against each framework's control set and produces structured compliance reports with per-control findings and remediation guidance.",
+
+  "capabilities": [
+    "run SOC 2 Trust Service Criteria audit on AWS and Azure",
+    "run GDPR data protection compliance audit on AWS and Azure",
+    "run HIPAA Security Rule audit on AWS and Azure",
+    "run ISO 27001 Annex A compliance audit on AWS and Azure",
+    "run PCI-DSS v4.0 compliance audit on AWS"
+  ],
+
+  "supported_context_types": [
+    "compliance_framework",
+    "resource_scope",
+    "account_scope",
+    "environment_scope"
+  ],
+
+  "skill_refs": [
+    "compliance.soc2_audit",
+    "compliance.gdpr_audit",
+    "compliance.hipaa_audit",
+    "compliance.iso27001_audit",
+    "compliance.pci_dss_audit"
+  ],
+
+  "composition": {
+    "usable_in_profiles":    [],
+    "compatible_agents":     [],
+    "conflicts_with_agents": []
+  },
+
+  "owner": {
+    "team":    "security-engineering",
+    "contact": "security@tessell.internal"
+  },
+
+  "version": "0.1.0"
+}

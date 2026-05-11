@@ -1,0 +1,44 @@
+{
+  "agent_id":     "domain.billing.cost",
+  "name":         "cost-query-agent",
+  "display_name": "Cloud Cost Query Agent",
+  "agent_type":   "domain",
+  "domain":       "billing",
+  "tier_support": ["basic"],
+  "status":       "active",
+  "tenant_id":    null,
+
+  "purpose": "Query cloud cost and billing data from AWS Cost Explorer or Azure Cost Management for any time range and service filter.",
+  "description": "Billing agent for querying cloud spend across AWS and Azure. Supports cost breakdown by service, region, granularity (MONTHLY/DAILY/HOURLY), and cost metric (AmortizedCost, UnblendedCost, BlendedCost for AWS; ActualCost, AmortizedCost for Azure). Multi-step execution for comparing multiple services or time periods.",
+
+  "capabilities": [
+    "retrieve AWS cost data from Cost Explorer for any time period",
+    "retrieve Azure cost data from Cost Management API",
+    "filter costs by service, region, account-id, profile, and tag",
+    "support MONTHLY, DAILY, and HOURLY cost granularity breakdowns",
+    "compare costs across multiple services or periods via multi-step execution"
+  ],
+
+  "supported_context_types": [
+    "billing_time_range",
+    "service_filter",
+    "account_scope"
+  ],
+
+  "skill_refs": [
+    "billing.cost_query"
+  ],
+
+  "composition": {
+    "usable_in_profiles":    [],
+    "compatible_agents":     [],
+    "conflicts_with_agents": []
+  },
+
+  "owner": {
+    "team":    "platform-engineering",
+    "contact": "platform@tessell.internal"
+  },
+
+  "version": "0.1.0"
+}

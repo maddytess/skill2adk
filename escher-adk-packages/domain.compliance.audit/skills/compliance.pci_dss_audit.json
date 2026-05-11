@@ -1,0 +1,98 @@
+{
+  "skill_id":       "compliance.pci_dss_audit",
+  "display_name":   "PCI-DSS v4.0 Compliance Checker",
+  "owner_agent_id": "domain.compliance.audit",
+  "capability_id":  "run_pci_dss_audit",
+  "domain":         "compliance",
+  "tier":           "basic",
+  "status":         "active",
+  "tenant_id":      null,
+
+  "purpose":     "Run a PCI-DSS v4.0 compliance audit against AWS and Azure infrastructure covering network security, cardholder data protection, access control, and logging.",
+  "description": "Evaluates AWS and Azure against PCI-DSS v4.0. Covers: network segmentation (Req 1), cardholder data (Req 3 & 4), access control (Req 7 & 8), logging (Req 10), vulnerability management (Req 6 & 11). Each provider is audited independently. Not for SOC 2, ISO, HIPAA, or GDPR.",
+
+  "capabilities": [
+    "evaluate AWS network security controls against PCI-DSS Requirement 1",
+    "evaluate Azure network security groups against PCI-DSS Requirement 1",
+    "check cardholder data protection for Requirements 3 and 4 (encryption, TLS)",
+    "audit access controls for Requirements 7 and 8 (least privilege, MFA, IAM/RBAC)",
+    "verify audit logging for Requirement 10 (CloudTrail, GuardDuty, Azure diagnostics)",
+    "assess vulnerability management for Requirements 6 and 11"
+  ],
+
+  "context_descriptions": [
+    "network security controls — security groups, NACLs, VPC flow logs",
+    "cardholder data protection — encryption at rest and in transit, TLS, KMS",
+    "access control inventory — IAM policies, MFA, least-privilege role assignments",
+    "audit logging configuration — CloudTrail, GuardDuty, CloudWatch alarms"
+  ],
+
+  "supported_context_types": [
+    "network_security_inventory",
+    "data_protection_inventory",
+    "access_control_inventory",
+    "account_scope"
+  ],
+
+  "tool_affinity": {
+    "allowed_tool_classes": ["compliance_read"],
+    "preferred_tool_tags":  ["pci", "pci-dss", "cardholder", "compliance", "audit", "payment"],
+    "execution_locations":  ["client"]
+  },
+
+  "context": {
+    "merge_strategy":      "union",
+    "dedupe_keys":         ["account_scope"],
+    "max_parallel":        2,
+    "on_missing_required": "request_more"
+  },
+
+  "execution_plan": {
+    "steps": [
+      {
+        "step_id":      "run_pci_dss_checks",
+        "context_type": "network_security_inventory",
+        "tool_class":   "compliance_read",
+        "depends_on":   [],
+        "required":     true,
+        "on_failure":   "stop"
+      }
+    ],
+    "on_partial_failure": "fail"
+  },
+
+  "output_type":       "compliance_report",
+  "output_schema_ref": "schemas/pci_dss_report.yaml",
+
+  "client_action_type": "pci_dss_checker",
+
+  "tool_ids": [
+    "aws.run_pci_dss_audit",
+    "azure.run_pci_dss_audit"
+  ],
+
+  "artifact_effects": {
+    "can_create": ["compliance_report"],
+    "can_update": [],
+    "can_enrich": ["finding"]
+  },
+
+  "action_semantics": {
+    "can_request_execution":            false,
+    "can_generate_plan_fragments":      false,
+    "can_generate_bundle_hints":        false,
+    "can_generate_playbook_candidates": true
+  },
+
+  "safety": {
+    "safety_class":              "advisory",
+    "requires_human_review_for": []
+  },
+
+  "evidence": {
+    "emits_rationale":  true,
+    "emits_confidence": true
+  },
+
+  "version": "0.1.0"
+}

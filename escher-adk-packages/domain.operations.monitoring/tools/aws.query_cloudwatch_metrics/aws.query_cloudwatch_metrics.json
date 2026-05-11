@@ -1,0 +1,99 @@
+{
+  "tool_id":    "aws.query_cloudwatch_metrics",
+  "name":       "AWS CloudWatch Metrics Query",
+  "description": "Query AWS CloudWatch for infrastructure metrics — CPU, memory, disk, network — with dimension and threshold filtering.",
+  "tool_class": "metrics_read",
+  "tool_type":  "readonly",
+
+  "domain":         ["operations"],
+  "provider":       "aws",
+  "resource_types": [
+    "AWS::CloudWatch::Metric"
+  ],
+  "api_calls": [
+    "cloudwatch:GetMetricStatistics",
+    "cloudwatch:ListMetrics",
+    "cloudwatch:DescribeAlarms"
+  ],
+
+  "source_code": {
+    "filename": "aws.query_cloudwatch_metrics.py",
+    "language": "python",
+    "git_loc":  "",
+    "git_tag":  ""
+  },
+
+  "execution_location": "client",
+  "execution_timeout":  30,
+
+  "input_schema": {
+    "parameters": [
+      {
+        "name":        "profile",
+        "type":        "string",
+        "required":    true,
+        "description": "AWS profile name from Cloud Profile context"
+      },
+      {
+        "name":        "service",
+        "type":        "string",
+        "required":    true,
+        "description": "CloudWatch namespace / service e.g. ec2, rds, lambda"
+      },
+      {
+        "name":        "region",
+        "type":        "string",
+        "required":    false,
+        "description": "AWS region — empty for default region"
+      },
+      {
+        "name":        "metric",
+        "type":        "string",
+        "required":    false,
+        "description": "CloudWatch metric name e.g. CPUUtilization, FreeStorageSpace, Errors — empty for all"
+      },
+      {
+        "name":        "dimensions",
+        "type":        "string",
+        "required":    false,
+        "description": "CloudWatch dimensions filter e.g. InstanceId=i-1234 — empty for all"
+      },
+      {
+        "name":        "tags",
+        "type":        "string",
+        "required":    false,
+        "description": "resource tag filter e.g. Env=prod — empty for all"
+      },
+      {
+        "name":        "duration",
+        "type":        "string",
+        "required":    false,
+        "description": "lookback window e.g. 1h, 6h, 24h, 7d — default 1h"
+      },
+      {
+        "name":        "threshold",
+        "type":        "string",
+        "required":    false,
+        "description": "threshold condition e.g. >80, <20 — empty if no threshold"
+      },
+      {
+        "name":        "top",
+        "type":        "integer",
+        "required":    false,
+        "description": "return top N results by value — 0 for all"
+      },
+      {
+        "name":        "stats",
+        "type":        "string",
+        "required":    false,
+        "description": "Average | Maximum | Sum — default Average"
+      }
+    ]
+  },
+
+  "output_schema_ref": "schemas/metric_report.yaml",
+  "safety_class":      "read_only",
+  "cacheable":         false,
+  "version":           "0.1.0",
+  "tenant_id":         null
+}

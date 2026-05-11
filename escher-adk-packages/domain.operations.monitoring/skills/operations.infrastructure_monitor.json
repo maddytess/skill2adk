@@ -1,0 +1,97 @@
+{
+  "skill_id":       "operations.infrastructure_monitor",
+  "display_name":   "Infrastructure Health Monitor",
+  "owner_agent_id": "domain.operations.monitoring",
+  "capability_id":  "monitor_infrastructure_metrics",
+  "domain":         "operations",
+  "tier":           "basic",
+  "status":         "active",
+  "tenant_id":      null,
+
+  "purpose":     "Monitor AWS CloudWatch or Azure Monitor metrics for infrastructure health and performance.",
+  "description": "Queries CloudWatch or Azure Monitor for real-time and historical metrics. Use for: EC2 CPU metrics, RDS memory, alarm status, disk utilization, performance thresholds, health checks. Supports service/region/dimension/tag filtering, threshold conditions (>80, <20), top-N results. Multi-step for multiple metrics or resources.",
+
+  "capabilities": [
+    "retrieve CloudWatch metrics for any AWS service (EC2, RDS, Lambda, ECS, ELB, etc.)",
+    "retrieve Azure Monitor metrics for any Azure resource type",
+    "filter metrics by dimensions, tags, region, and resource identifier",
+    "evaluate threshold conditions and flag resources exceeding limits",
+    "return top-N resources by metric value for capacity planning"
+  ],
+
+  "context_descriptions": [
+    "metric name and namespace — CloudWatch metric (e.g. CPUUtilization) or Azure metric (e.g. Percentage CPU)",
+    "resource dimensions — instance IDs, DB identifiers, or resource names to scope the query",
+    "monitoring duration — time window for metric aggregation (e.g. last 24h, last 7d)",
+    "threshold condition — value to compare against with direction (>80, <20)"
+  ],
+
+  "supported_context_types": [
+    "metric_spec",
+    "resource_scope",
+    "time_window",
+    "threshold_condition"
+  ],
+
+  "tool_affinity": {
+    "allowed_tool_classes": ["metrics_read"],
+    "preferred_tool_tags":  ["monitor", "metrics", "cloudwatch", "azure-monitor", "cpu", "memory", "health"],
+    "execution_locations":  ["client"]
+  },
+
+  "context": {
+    "merge_strategy":      "union",
+    "dedupe_keys":         ["resource_scope"],
+    "max_parallel":        2,
+    "on_missing_required": "request_more"
+  },
+
+  "execution_plan": {
+    "steps": [
+      {
+        "step_id":      "fetch_metrics",
+        "context_type": "metric_spec",
+        "tool_class":   "metrics_read",
+        "depends_on":   [],
+        "required":     true,
+        "on_failure":   "stop"
+      }
+    ],
+    "on_partial_failure": "fail"
+  },
+
+  "output_type":       "metric_report",
+  "output_schema_ref": "schemas/metric_report.yaml",
+
+  "client_action_type": "monitor",
+
+  "tool_ids": [
+    "aws.query_cloudwatch_metrics",
+    "azure.query_monitor_metrics"
+  ],
+
+  "artifact_effects": {
+    "can_create": ["metric_report"],
+    "can_update": [],
+    "can_enrich": ["finding"]
+  },
+
+  "action_semantics": {
+    "can_request_execution":            false,
+    "can_generate_plan_fragments":      true,
+    "can_generate_bundle_hints":        false,
+    "can_generate_playbook_candidates": false
+  },
+
+  "safety": {
+    "safety_class":              "advisory",
+    "requires_human_review_for": []
+  },
+
+  "evidence": {
+    "emits_rationale":  true,
+    "emits_confidence": true
+  },
+
+  "version": "0.1.0"
+}

@@ -1,0 +1,96 @@
+{
+  "skill_id":       "billing.cost_query",
+  "display_name":   "Cloud Cost Query",
+  "owner_agent_id": "domain.billing.cost",
+  "capability_id":  "query_cloud_costs",
+  "domain":         "billing",
+  "tier":           "basic",
+  "status":         "active",
+  "tenant_id":      null,
+
+  "purpose":     "Fetch cloud cost and billing data from AWS or Azure for any time range and service filter.",
+  "description": "Queries AWS Cost Explorer or Azure Cost Management. Use for: what did EC2 cost last month, how much did we spend on S3, Azure costs for last 6 months, compare EC2 vs Lambda costs, daily cost breakdown, YTD spend by service. Supports MONTHLY/DAILY granularity, service/region filtering, account scoping. Multi-step for multiple services or time periods.",
+
+  "capabilities": [
+    "retrieve AWS cost data from Cost Explorer for any time period",
+    "retrieve Azure cost data from Cost Management API",
+    "filter costs by service, region, account-id, profile, and tag",
+    "support MONTHLY, DAILY, and HOURLY cost granularity breakdowns",
+    "compare costs across multiple services or periods via multi-step execution"
+  ],
+
+  "context_descriptions": [
+    "billing time range — start and end dates for cost query with monthly boundary alignment",
+    "service filter — specific AWS or Azure service to scope the cost query",
+    "cost metric — AmortizedCost, UnblendedCost, BlendedCost for AWS; ActualCost, AmortizedCost for Azure",
+    "account scope — AWS profile or Azure subscription-name to target"
+  ],
+
+  "supported_context_types": [
+    "billing_time_range",
+    "service_filter",
+    "account_scope"
+  ],
+
+  "tool_affinity": {
+    "allowed_tool_classes": ["billing_read"],
+    "preferred_tool_tags":  ["cost", "billing", "aws", "azure"],
+    "execution_locations":  ["client"]
+  },
+
+  "context": {
+    "merge_strategy": "union",
+    "dedupe_keys": ["account_scope"],
+    "max_parallel": 2,
+    "on_missing_required": "request_more"
+  },
+
+  "execution_plan": {
+    "steps": [
+      {
+        "step_id":      "fetch_cost_data",
+        "context_type": "billing_time_range",
+        "tool_class":   "billing_read",
+        "depends_on":   [],
+        "required":     true,
+        "on_failure":   "stop"
+      }
+    ],
+    "on_partial_failure": "fail"
+  },
+
+  "output_type":       "cost_report",
+  "output_schema_ref": "schemas/cost_report.yaml",
+
+  "client_action_type": "cost",
+
+  "tool_ids": [
+    "aws.query_cost_explorer",
+    "azure.query_cost_management"
+  ],
+
+  "artifact_effects": {
+    "can_create": ["cost_report"],
+    "can_update": [],
+    "can_enrich": []
+  },
+
+  "action_semantics": {
+    "can_request_execution":            false,
+    "can_generate_plan_fragments":      false,
+    "can_generate_bundle_hints":        false,
+    "can_generate_playbook_candidates": false
+  },
+
+  "safety": {
+    "safety_class": "advisory",
+    "requires_human_review_for": []
+  },
+
+  "evidence": {
+    "emits_rationale":  true,
+    "emits_confidence": true
+  },
+
+  "version": "0.1.0"
+}

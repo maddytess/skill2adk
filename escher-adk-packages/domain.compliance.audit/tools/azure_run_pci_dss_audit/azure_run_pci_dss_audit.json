@@ -1,0 +1,51 @@
+{
+  "tool_id":    "azure.run_pci_dss_audit",
+  "name":       "Azure PCI-DSS v4.0 Compliance Audit",
+  "description": "Evaluate Azure infrastructure against PCI-DSS v4.0 requirements covering network security, cardholder data protection, access control, and audit logging.",
+  "tool_class": "compliance_read",
+  "tool_type":  "readonly",
+
+  "domain":         ["compliance"],
+  "provider":       "azure",
+  "resource_types": [
+    "Microsoft.Network/networkSecurityGroups",
+    "Microsoft.Storage/storageAccounts",
+    "Microsoft.KeyVault/vaults",
+    "Microsoft.Authorization/roleAssignments",
+    "Microsoft.Insights/diagnosticSettings"
+  ],
+  "api_calls": [
+    "Microsoft.Network/networkSecurityGroups/read",
+    "Microsoft.Storage/storageAccounts/read",
+    "Microsoft.KeyVault/vaults/read",
+    "Microsoft.Authorization/roleAssignments/read",
+    "Microsoft.Insights/diagnosticSettings/read"
+  ],
+
+  "source_code": {
+    "filename": "azure.run_pci_dss_audit.py",
+    "language": "python",
+    "git_loc":  "",
+    "git_tag":  ""
+  },
+
+  "execution_location": "client",
+  "execution_timeout":  60,
+
+  "input_schema": {
+    "parameters": [
+      {
+        "name":        "subscription-name",
+        "type":        "string",
+        "required":    true,
+        "description": "Azure profile name from Cloud Profile context"
+      }
+    ]
+  },
+
+  "output_schema_ref": "schemas/pci_dss_report.yaml",
+  "safety_class":      "read_only",
+  "cacheable":         true,
+  "version":           "0.1.0",
+  "tenant_id":         null
+}

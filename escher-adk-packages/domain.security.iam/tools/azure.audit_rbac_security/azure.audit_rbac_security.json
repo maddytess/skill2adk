@@ -1,0 +1,50 @@
+{
+  "tool_id":    "azure.audit_rbac_security",
+  "name":       "Azure RBAC Security Audit",
+  "description": "Audit Azure RBAC assignments, managed identities, and Key Vault access policies for security misconfigurations.",
+  "tool_class": "iam_read",
+  "tool_type":  "readonly",
+
+  "domain":         ["security"],
+  "provider":       "azure",
+  "resource_types": [
+    "Microsoft.Authorization/roleAssignments",
+    "Microsoft.Authorization/roleDefinitions",
+    "Microsoft.ManagedIdentity/userAssignedIdentities",
+    "Microsoft.KeyVault/vaults"
+  ],
+  "api_calls": [
+    "Microsoft.Authorization/roleAssignments/read",
+    "Microsoft.Authorization/roleDefinitions/read",
+    "Microsoft.ManagedIdentity/userAssignedIdentities/read",
+    "Microsoft.KeyVault/vaults/read",
+    "Microsoft.KeyVault/vaults/accessPolicies/write"
+  ],
+
+  "source_code": {
+    "filename": "azure.audit_rbac_security.py",
+    "language": "python",
+    "git_loc":  "",
+    "git_tag":  ""
+  },
+
+  "execution_location": "client",
+  "execution_timeout":  60,
+
+  "input_schema": {
+    "parameters": [
+      {
+        "name":        "subsciption-name",
+        "type":        "string",
+        "required":    true,
+        "description": "Azure profile name from Cloud Profile context"
+      }
+    ]
+  },
+
+  "output_schema_ref": "schemas/iam_security_finding.yaml",
+  "safety_class":      "read_only",
+  "cacheable":         true,
+  "version":           "0.1.0",
+  "tenant_id":         null
+}

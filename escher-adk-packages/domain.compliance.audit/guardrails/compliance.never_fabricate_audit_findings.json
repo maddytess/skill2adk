@@ -1,0 +1,56 @@
+{
+  "guardrail_id":   "compliance.never_fabricate_audit_findings",
+  "name":           "Never fabricate compliance audit findings",
+  "scope":          "domain",
+  "skill_id":       null,
+  "owner_agent_id": null,
+  "domain":         "compliance",
+  "tenant_id":      null,
+
+  "rules": [
+    {
+      "rule_id":     "no_invented_control_findings",
+      "description": "Never report a control as passing or failing without direct evidence from a compliance tool output. Every finding must be derived from an actual API response (e.g. iam:ListUsers, s3:GetBucketEncryption, cloudtrail:DescribeTrails).",
+      "enforcement": "hard",
+      "action":      "block"
+    },
+    {
+      "rule_id":     "framework_scope_isolation",
+      "description": "Never apply findings from one framework audit to another. SOC 2 control results must not be used to infer GDPR, HIPAA, ISO 27001, or PCI-DSS compliance, and vice versa. Each framework has a dedicated skill and distinct control set.",
+      "enforcement": "hard",
+      "action":      "block"
+    },
+    {
+      "rule_id":     "cite_control_evidence_source",
+      "description": "Every control finding must reference the specific resource evaluated (e.g. bucket name, IAM role ARN, security group ID), the API call that produced the evidence, and the tool output it came from.",
+      "enforcement": "hard",
+      "action":      "block"
+    },
+    {
+      "rule_id":     "no_cross_provider_inference",
+      "description": "AWS audit results must not be used to infer Azure compliance status, and vice versa. Each provider requires a separate tool run. If only one provider was audited, do not report on the other provider's compliance posture.",
+      "enforcement": "hard",
+      "action":      "block"
+    },
+    {
+      "rule_id":     "pci_dss_separate_provider_runs",
+      "description": "PCI-DSS audit must run separately for AWS (aws.run_pci_dss_audit) and Azure (azure.run_pci_dss_audit). Never combine or infer PCI-DSS findings across providers — each provider's control evidence must come from its own dedicated tool run.",
+      "enforcement": "hard",
+      "action":      "block"
+    },
+    {
+      "rule_id":     "partial_audit_disclosure",
+      "description": "If any tool returned incomplete data or could not access specific resources (e.g. API timeout, permission denied on a resource type), disclose which controls lack full evidence coverage before presenting an overall control status.",
+      "enforcement": "soft",
+      "action":      "warn"
+    },
+    {
+      "rule_id":     "no_certification_claims",
+      "description": "Never assert that the account is certified or fully compliant with any framework. Report control-level pass/fail status only. Formal certification (SOC 2 Type II, HIPAA attestation, PCI-DSS QSA sign-off, etc.) requires human auditor review and organizational process.",
+      "enforcement": "hard",
+      "action":      "block"
+    }
+  ],
+
+  "version": "0.1.0"
+}

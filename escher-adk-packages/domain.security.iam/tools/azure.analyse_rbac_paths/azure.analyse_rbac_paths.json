@@ -1,0 +1,47 @@
+{
+  "tool_id":    "azure.analyze_rbac_paths",
+  "name":       "Azure RBAC Privilege Path Analyzer",
+  "description": "Analyze Azure RBAC role assignments, managed identity bindings, and privilege escalation vectors.",
+  "tool_class": "iam_read",
+  "tool_type":  "readonly",
+
+  "domain":         ["security"],
+  "provider":       "azure",
+  "resource_types": [
+    "Microsoft.Authorization/roleAssignments",
+    "Microsoft.Authorization/roleDefinitions",
+    "Microsoft.ManagedIdentity/userAssignedIdentities"
+  ],
+  "api_calls": [
+    "Microsoft.Authorization/roleAssignments/read",
+    "Microsoft.Authorization/roleDefinitions/read",
+    "Microsoft.ManagedIdentity/userAssignedIdentities/read"
+  ],
+
+  "source_code": {
+    "filename": "azure.analyze_rbac_paths.py",
+    "language": "python",
+    "git_loc":  "",
+    "git_tag":  ""
+  },
+
+  "execution_location": "client",
+  "execution_timeout":  45,
+
+  "input_schema": {
+    "parameters": [
+      {
+        "name":        "subscription-name",
+        "type":        "string",
+        "required":    false,
+        "description": "Azure subscription name or empty"
+      }
+    ]
+  },
+
+  "output_schema_ref": "schemas/iam_access_path_finding.yaml",
+  "safety_class":      "read_only",
+  "cacheable":         true,
+  "version":           "0.1.0",
+  "tenant_id":         null
+}

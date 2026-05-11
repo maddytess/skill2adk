@@ -1,0 +1,2 @@
+[console_scripts]
+skill2adk = skill2adk.cli:main

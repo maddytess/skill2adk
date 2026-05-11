@@ -1,0 +1,57 @@
+{
+  "tool_id":    "aws.run_soc2_audit",
+  "name":       "AWS SOC 2 Compliance Audit",
+  "description": "Evaluate AWS infrastructure against SOC 2 Trust Service Criteria and return a structured compliance report.",
+  "tool_class": "compliance_read",
+  "tool_type":  "readonly",
+
+  "domain":         ["compliance"],
+  "provider":       "aws",
+  "resource_types": [
+    "AWS::IAM::User",
+    "AWS::IAM::Role",
+    "AWS::CloudTrail::Trail",
+    "AWS::Config::ConfigurationRecorder",
+    "AWS::CloudWatch::Alarm",
+    "AWS::EC2::SecurityGroup",
+    "AWS::S3::Bucket",
+    "AWS::KMS::Key"
+  ],
+  "api_calls": [
+    "iam:ListUsers",
+    "iam:GetAccountPasswordPolicy",
+    "cloudtrail:DescribeTrails",
+    "config:DescribeConfigurationRecorders",
+    "cloudwatch:DescribeAlarms",
+    "ec2:DescribeSecurityGroups",
+    "s3:GetBucketEncryption",
+    "kms:ListKeys"
+  ],
+
+  "source_code": {
+    "filename": "aws.run_soc2_audit.py",
+    "language": "python",
+    "git_loc":  "",
+    "git_tag":  ""
+  },
+
+  "execution_location": "client",
+  "execution_timeout":  60,
+
+  "input_schema": {
+    "parameters": [
+      {
+        "name":        "profile",
+        "type":        "string",
+        "required":    true,
+        "description": "AWS profile name from Cloud Profile context"
+      }
+    ]
+  },
+
+  "output_schema_ref": "schemas/compliance_report.yaml",
+  "safety_class":      "read_only",
+  "cacheable":         true,
+  "version":           "0.1.0",
+  "tenant_id":         null
+}

@@ -1,0 +1,113 @@
+{
+  "skill_id":       "security.iam_security_audit",
+  "display_name":   "IAM Security Audit",
+  "owner_agent_id": "domain.security.iam",
+  "capability_id":  "audit_iam_security",
+  "domain":         "security",
+  "tier":           "basic",
+  "status":         "active",
+  "tenant_id":      null,
+
+  "purpose":     "Run a comprehensive IAM security audit covering users, roles, MFA, access keys, and policies for AWS or Azure.",
+  "description": "Audits IAM for security misconfigurations. Use for: MFA enforcement, stale/unused access keys, inactive users, wildcard policies, admin role assignments, broad trust policies, password policy, Azure RBAC audit, managed identity checks, Key Vault access. NOT for IAM trust chain or privilege escalation analysis (use iam_access_path for that).",
+
+  "capabilities": [
+    "detect users without MFA and root account without hardware MFA",
+    "find stale, unused, or overly-permissive IAM access keys",
+    "identify inactive IAM users and unrotated credentials",
+    "detect wildcard (*) actions in IAM policies and overly broad admin roles",
+    "audit Azure RBAC assignments, managed identities, and Key Vault access policies"
+  ],
+
+  "context_descriptions": [
+    "IAM user inventory — all users, MFA status, last activity, and access key age",
+    "IAM policy inventory — managed and inline policies with overly-permissive patterns",
+    "IAM role inventory — roles, trust relationships, and cross-account assumptions",
+    "Azure RBAC assignments — role definitions and managed identity bindings"
+  ],
+
+  "supported_context_types": [
+    "iam_user_inventory",
+    "iam_policy_inventory",
+    "iam_role_inventory",
+    "account_scope"
+  ],
+
+  "tool_affinity": {
+    "allowed_tool_classes": ["iam_read"],
+    "preferred_tool_tags":  ["iam", "audit", "mfa", "access-keys", "policy", "security"],
+    "execution_locations":  ["client"]
+  },
+
+  "context": {
+    "merge_strategy":      "union",
+    "dedupe_keys":         ["account_scope"],
+    "max_parallel":        2,
+    "on_missing_required": "request_more"
+  },
+
+  "execution_plan": {
+    "steps": [
+      {
+        "step_id":      "audit_iam_users",
+        "context_type": "iam_user_inventory",
+        "tool_class":   "iam_read",
+        "depends_on":   [],
+        "required":     true,
+        "on_failure":   "stop"
+      },
+      {
+        "step_id":      "audit_iam_policies",
+        "context_type": "iam_policy_inventory",
+        "tool_class":   "iam_read",
+        "depends_on":   [],
+        "required":     true,
+        "on_failure":   "stop"
+      },
+      {
+        "step_id":      "audit_iam_roles",
+        "context_type": "iam_role_inventory",
+        "tool_class":   "iam_read",
+        "depends_on":   ["audit_iam_users"],
+        "required":     false,
+        "on_failure":   "skip"
+      }
+    ],
+    "on_partial_failure": "continue"
+  },
+
+  "output_type":       "finding",
+  "output_schema_ref": "schemas/iam_security_finding.yaml",
+
+  "client_action_type": "audit_iam",
+
+  "tool_ids": [
+    "aws.audit_iam_security",
+    "azure.audit_rbac_security"
+  ],
+
+  "artifact_effects": {
+    "can_create": ["finding"],
+    "can_update": [],
+    "can_enrich": ["triage"]
+  },
+
+  "action_semantics": {
+    "can_request_execution":            false,
+    "can_generate_plan_fragments":      true,
+    "can_generate_bundle_hints":        false,
+    "can_generate_playbook_candidates": true
+  },
+
+  "safety": {
+    "safety_class":              "advisory",
+    "requires_human_review_for": []
+  },
+
+  "evidence": {
+    "emits_rationale":  true,
+    "emits_confidence": true
+  },
+
+  "version": "0.1.0"
+}

@@ -1,0 +1,104 @@
+{
+  "tool_id":    "aws.query_cloudtrail_events",
+  "name":       "AWS CloudTrail Event Query",
+  "description": "Query AWS CloudTrail for historical API events — who did what, when, and from where — with actor, resource, time, and error-code filtering.",
+  "tool_class": "audit_read",
+  "tool_type":  "readonly",
+
+  "domain":         ["security"],
+  "provider":       "aws",
+  "resource_types": [
+    "AWS::CloudTrail::Trail"
+  ],
+  "api_calls": [
+    "cloudtrail:LookupEvents",
+    "cloudtrail:GetTrailStatus"
+  ],
+
+  "source_code": {
+    "filename": "aws.query_cloudtrail_events.py",
+    "language": "python",
+    "git_loc":  "",
+    "git_tag":  ""
+  },
+
+  "execution_location": "client",
+  "execution_timeout":  30,
+
+  "input_schema": {
+    "parameters": [
+      {
+        "name":        "event_source",
+        "type":        "string",
+        "required":    false,
+        "description": "AWS service source e.g. ec2.amazonaws.com, s3.amazonaws.com — empty for any service"
+      },
+      {
+        "name":        "event_name",
+        "type":        "string",
+        "required":    false,
+        "description": "CloudTrail API event name e.g. StopInstances, DeleteBucket — ONE event per step"
+      },
+      {
+        "name":        "user",
+        "type":        "string",
+        "required":    false,
+        "description": "IAM username or ARN who performed the action — empty for any user"
+      },
+      {
+        "name":        "start",
+        "type":        "string",
+        "required":    true,
+        "description": "YYYY-MM-DD — derive from query or default to 30 days ago"
+      },
+      {
+        "name":        "end",
+        "type":        "string",
+        "required":    true,
+        "description": "YYYY-MM-DD — derive from query or default to today"
+      },
+      {
+        "name":        "region",
+        "type":        "string",
+        "required":    false,
+        "description": "AWS region — empty for all regions"
+      },
+      {
+        "name":        "resource_name",
+        "type":        "string",
+        "required":    false,
+        "description": "specific resource name to filter events — empty for all"
+      },
+      {
+        "name":        "resource_type",
+        "type":        "string",
+        "required":    false,
+        "description": "resource type e.g. AWS::EC2::Instance — empty for all"
+      },
+      {
+        "name":        "ip",
+        "type":        "string",
+        "required":    false,
+        "description": "source IP address filter — empty for all IPs"
+      },
+      {
+        "name":        "error_code",
+        "type":        "string",
+        "required":    false,
+        "description": "error code for failed events e.g. AccessDenied — empty for all"
+      },
+      {
+        "name":        "profile",
+        "type":        "string",
+        "required":    true,
+        "description": "AWS profile name from Cloud Profile context"
+      }
+    ]
+  },
+
+  "output_schema_ref": "schemas/audit_event_report.yaml",
+  "safety_class":      "read_only",
+  "cacheable":         false,
+  "version":           "0.1.0",
+  "tenant_id":         null
+}

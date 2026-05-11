@@ -1,0 +1,14 @@
+README.md
+pyproject.toml
+skill2adk/__init__.py
+skill2adk/cli.py
+skill2adk/generator.py
+skill2adk/inference.py
+skill2adk/ingest.py
+skill2adk/models.py
+skill2adk.egg-info/PKG-INFO
+skill2adk.egg-info/SOURCES.txt
+skill2adk.egg-info/dependency_links.txt
+skill2adk.egg-info/entry_points.txt
+skill2adk.egg-info/requires.txt
+skill2adk.egg-info/top_level.txt

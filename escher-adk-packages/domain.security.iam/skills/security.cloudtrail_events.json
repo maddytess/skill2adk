@@ -1,0 +1,97 @@
+{
+  "skill_id":       "security.cloudtrail_events",
+  "display_name":   "CloudTrail Audit Events",
+  "owner_agent_id": "domain.security.iam",
+  "capability_id":  "query_audit_events",
+  "domain":         "security",
+  "tier":           "basic",
+  "status":         "active",
+  "tenant_id":      null,
+
+  "purpose":     "Query CloudTrail or Azure Activity Log for historical events — who did what, when, and from where.",
+  "description": "Searches CloudTrail event history or Azure Activity Log. Use for: who stopped my EC2, who created or deleted a resource, user activity history, API call records, detect unauthorized actions. Multi-step required for multiple event types (CloudTrail constraint: one event-name per step).",
+
+  "capabilities": [
+    "query CloudTrail for specific API events with full filter support (event-name, user, IP, resource, error-code)",
+    "query Azure Activity Log for resource operation history",
+    "detect who performed a specific action (stopped, terminated, created, deleted a resource)",
+    "surface failed or unauthorized API calls via error-code filtering",
+    "return compact or full event records with requester identity and source IP"
+  ],
+
+  "context_descriptions": [
+    "event filter — CloudTrail event-name (e.g. StopInstances) or Azure resource-provider",
+    "actor filter — username or IAM principal who performed the action",
+    "time range — audit window with exact ISO-8601 start and end timestamps",
+    "resource filter — specific resource name or type to narrow audit results"
+  ],
+
+  "supported_context_types": [
+    "audit_event_filter",
+    "actor_scope",
+    "audit_time_range",
+    "resource_filter"
+  ],
+
+  "tool_affinity": {
+    "allowed_tool_classes": ["audit_read"],
+    "preferred_tool_tags":  ["cloudtrail", "events", "who", "activity", "audit", "logs"],
+    "execution_locations":  ["client"]
+  },
+
+  "context": {
+    "merge_strategy":      "union",
+    "dedupe_keys":         ["actor_scope"],
+    "max_parallel":        2,
+    "on_missing_required": "request_more"
+  },
+
+  "execution_plan": {
+    "steps": [
+      {
+        "step_id":      "query_events",
+        "context_type": "audit_event_filter",
+        "tool_class":   "audit_read",
+        "depends_on":   [],
+        "required":     true,
+        "on_failure":   "stop"
+      }
+    ],
+    "on_partial_failure": "fail"
+  },
+
+  "output_type":       "audit_event_report",
+  "output_schema_ref": "schemas/audit_event_report.yaml",
+
+  "client_action_type": "events",
+
+  "tool_ids": [
+    "aws.query_cloudtrail_events",
+    "azure.query_activity_log"
+  ],
+
+  "artifact_effects": {
+    "can_create": ["audit_event_report"],
+    "can_update": [],
+    "can_enrich": ["finding"]
+  },
+
+  "action_semantics": {
+    "can_request_execution":            false,
+    "can_generate_plan_fragments":      false,
+    "can_generate_bundle_hints":        false,
+    "can_generate_playbook_candidates": false
+  },
+
+  "safety": {
+    "safety_class":              "advisory",
+    "requires_human_review_for": []
+  },
+
+  "evidence": {
+    "emits_rationale":  true,
+    "emits_confidence": true
+  },
+
+  "version": "0.1.0"
+}

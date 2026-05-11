@@ -1,0 +1,56 @@
+{
+  "tool_id":    "aws.audit_iam_security",
+  "name":       "AWS IAM Security Audit",
+  "description": "Audit IAM for security misconfigurations — MFA enforcement, stale access keys, inactive users, wildcard policies, and overly broad trust relationships.",
+  "tool_class": "iam_read",
+  "tool_type":  "readonly",
+
+  "domain":         ["security"],
+  "provider":       "aws",
+  "resource_types": [
+    "AWS::IAM::User",
+    "AWS::IAM::Role",
+    "AWS::IAM::Policy",
+    "AWS::IAM::AccessKey",
+    "AWS::IAM::MFADevice"
+  ],
+  "api_calls": [
+    "iam:ListUsers",
+    "iam:GetLoginProfile",
+    "iam:ListMFADevices",
+    "iam:ListAccessKeys",
+    "iam:GetAccessKeyLastUsed",
+    "iam:ListRoles",
+    "iam:ListPolicies",
+    "iam:GetPolicyVersion",
+    "iam:GetAccountPasswordPolicy",
+    "iam:GetAccountSummary"
+  ],
+
+  "source_code": {
+    "filename": "aws.audit_iam_security.py",
+    "language": "python",
+    "git_loc":  "",
+    "git_tag":  ""
+  },
+
+  "execution_location": "client",
+  "execution_timeout":  60,
+
+  "input_schema": {
+    "parameters": [
+      {
+        "name":        "profile",
+        "type":        "string",
+        "required":    true,
+        "description": "AWS profile name from Cloud Profile context"
+      }
+    ]
+  },
+
+  "output_schema_ref": "schemas/iam_security_finding.yaml",
+  "safety_class":      "read_only",
+  "cacheable":         true,
+  "version":           "0.1.0",
+  "tenant_id":         null
+}

@@ -1,0 +1,91 @@
+{
+  "skill_id":       "compliance.gdpr_audit",
+  "display_name":   "GDPR Compliance Audit",
+  "owner_agent_id": "domain.compliance.audit",
+  "capability_id":  "run_gdpr_audit",
+  "domain":         "compliance",
+  "tier":           "basic",
+  "status":         "active",
+  "tenant_id":      null,
+
+  "purpose":     "Run a GDPR data protection compliance audit against the cloud environment.",
+  "description": "Evaluates against GDPR data protection requirements for personal data and privacy. Use ONLY for GDPR compliance requests. Not for SOC 2, ISO 27001, HIPAA, or PCI audits.",
+
+  "capabilities": [
+    "evaluate AWS infrastructure against GDPR data protection requirements",
+    "evaluate Azure infrastructure against GDPR privacy and data security requirements",
+    "produce structured GDPR compliance report with per-article findings"
+  ],
+
+  "context_descriptions": [
+    "account scope — AWS profile or Azure subscription-name to audit",
+    "compliance framework — GDPR data protection article control set"
+  ],
+
+  "supported_context_types": [
+    "account_scope",
+    "compliance_framework"
+  ],
+
+  "tool_affinity": {
+    "allowed_tool_classes": ["compliance_read"],
+    "preferred_tool_tags":  ["gdpr", "privacy", "data-protection", "eu", "compliance", "audit"],
+    "execution_locations":  ["client"]
+  },
+
+  "context": {
+    "merge_strategy":      "union",
+    "dedupe_keys":         ["account_scope"],
+    "max_parallel":        2,
+    "on_missing_required": "request_more"
+  },
+
+  "execution_plan": {
+    "steps": [
+      {
+        "step_id":      "run_gdpr_checks",
+        "context_type": "compliance_framework",
+        "tool_class":   "compliance_read",
+        "depends_on":   [],
+        "required":     true,
+        "on_failure":   "stop"
+      }
+    ],
+    "on_partial_failure": "fail"
+  },
+
+  "output_type":       "compliance_report",
+  "output_schema_ref": "schemas/compliance_report.yaml",
+
+  "client_action_type": "gdpr",
+
+  "tool_ids": [
+    "aws.run_gdpr_audit",
+    "azure.run_gdpr_audit"
+  ],
+
+  "artifact_effects": {
+    "can_create": ["compliance_report"],
+    "can_update": [],
+    "can_enrich": ["finding"]
+  },
+
+  "action_semantics": {
+    "can_request_execution":            false,
+    "can_generate_plan_fragments":      false,
+    "can_generate_bundle_hints":        false,
+    "can_generate_playbook_candidates": true
+  },
+
+  "safety": {
+    "safety_class":              "advisory",
+    "requires_human_review_for": []
+  },
+
+  "evidence": {
+    "emits_rationale":  true,
+    "emits_confidence": true
+  },
+
+  "version": "0.1.0"
+}

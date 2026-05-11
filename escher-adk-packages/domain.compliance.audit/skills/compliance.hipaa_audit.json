@@ -1,0 +1,91 @@
+{
+  "skill_id":       "compliance.hipaa_audit",
+  "display_name":   "HIPAA Security Rule Audit",
+  "owner_agent_id": "domain.compliance.audit",
+  "capability_id":  "run_hipaa_audit",
+  "domain":         "compliance",
+  "tier":           "basic",
+  "status":         "active",
+  "tenant_id":      null,
+
+  "purpose":     "Run a HIPAA Security Rule compliance audit against the cloud environment for PHI data protection.",
+  "description": "Evaluates against HIPAA Security Rule requirements for protected health information. Use ONLY for HIPAA compliance requests. Not for SOC 2, ISO 27001, GDPR, or PCI audits.",
+
+  "capabilities": [
+    "evaluate AWS infrastructure against HIPAA Security Rule safeguards",
+    "evaluate Azure infrastructure against HIPAA PHI data protection requirements",
+    "produce structured HIPAA compliance report with per-safeguard findings"
+  ],
+
+  "context_descriptions": [
+    "account scope — AWS profile or Azure subscription-name to audit",
+    "compliance framework — HIPAA Security Rule safeguard control set"
+  ],
+
+  "supported_context_types": [
+    "account_scope",
+    "compliance_framework"
+  ],
+
+  "tool_affinity": {
+    "allowed_tool_classes": ["compliance_read"],
+    "preferred_tool_tags":  ["hipaa", "healthcare", "phi", "compliance", "audit"],
+    "execution_locations":  ["client"]
+  },
+
+  "context": {
+    "merge_strategy":      "union",
+    "dedupe_keys":         ["account_scope"],
+    "max_parallel":        2,
+    "on_missing_required": "request_more"
+  },
+
+  "execution_plan": {
+    "steps": [
+      {
+        "step_id":      "run_hipaa_checks",
+        "context_type": "compliance_framework",
+        "tool_class":   "compliance_read",
+        "depends_on":   [],
+        "required":     true,
+        "on_failure":   "stop"
+      }
+    ],
+    "on_partial_failure": "fail"
+  },
+
+  "output_type":       "compliance_report",
+  "output_schema_ref": "schemas/compliance_report.yaml",
+
+  "client_action_type": "hipaa",
+
+  "tool_ids": [
+    "aws.run_hipaa_audit",
+    "azure.run_hipaa_audit"
+  ],
+
+  "artifact_effects": {
+    "can_create": ["compliance_report"],
+    "can_update": [],
+    "can_enrich": ["finding"]
+  },
+
+  "action_semantics": {
+    "can_request_execution":            false,
+    "can_generate_plan_fragments":      false,
+    "can_generate_bundle_hints":        false,
+    "can_generate_playbook_candidates": true
+  },
+
+  "safety": {
+    "safety_class":              "advisory",
+    "requires_human_review_for": []
+  },
+
+  "evidence": {
+    "emits_rationale":  true,
+    "emits_confidence": true
+  },
+
+  "version": "0.1.0"
+}

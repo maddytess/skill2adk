@@ -1,0 +1,69 @@
+{
+  "tool_id":    "azure.query_cost_management",
+  "name":       "Azure Cost Management Query",
+  "description": "Query Azure Cost Management for cost and usage data by time range, service, granularity, and cost metric.",
+  "tool_class": "billing_read",
+  "tool_type":  "readonly",
+
+  "domain":         ["billing"],
+  "provider":       "azure",
+  "resource_types": ["Microsoft.CostManagement/query"],
+  "api_calls": [
+    "Microsoft.CostManagement/query/action"
+  ],
+
+  "source_code": {
+    "filename": "azure.query_cost_management.py",
+    "language": "python"
+  },
+
+  "execution_location": "client",
+  "execution_timeout":  30,
+
+  "input_schema": {
+    "parameters": [
+      {
+        "name":        "metric",
+        "type":        "string",
+        "required":    true,
+        "description": "ActualCost | AmortizedCost — default ActualCost"
+      },
+      {
+        "name":        "service",
+        "type":        "string",
+        "required":    false,
+        "description": "Azure service name or empty for all services"
+      },
+      {
+        "name":        "granularity",
+        "type":        "string",
+        "required":    true,
+        "description": "Monthly | Daily — default Monthly"
+      },
+      {
+        "name":        "subscription-name",
+        "type":        "string",
+        "required":    true,
+        "description": "Azure subscription name from Cloud Profile context"
+      },
+      {
+        "name":        "start",
+        "type":        "string",
+        "required":    true,
+        "description": "YYYY-MM-DDTHH:MM:SSZ — derive from query or default to 30 days ago"
+      },
+      {
+        "name":        "end",
+        "type":        "string",
+        "required":    true,
+        "description": "YYYY-MM-DDTHH:MM:SSZ — derive from query or default to today"
+      }
+    ]
+  },
+
+  "output_schema_ref": "schemas/cost_report.yaml",
+  "safety_class":      "read_only",
+  "cacheable":         true,
+  "version":           "0.1.0",
+  "tenant_id":         null
+}

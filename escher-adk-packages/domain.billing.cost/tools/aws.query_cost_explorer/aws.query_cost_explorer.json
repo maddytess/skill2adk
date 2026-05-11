@@ -1,0 +1,90 @@
+{
+  "tool_id":    "aws.query_cost_explorer",
+  "name":       "AWS Cost Explorer Query",
+  "description": "Query AWS Cost Explorer for cost and usage data by time range, service, region, granularity, and cost metric.",
+  "tool_class": "billing_read",
+  "tool_type":  "readonly",
+
+  "domain":         ["billing"],
+  "provider":       "aws",
+  "resource_types": ["AWS::CostExplorer::CostAndUsage"],
+  "api_calls": [
+    "ce:GetCostAndUsage",
+    "ce:GetCostAndUsageForecast"
+  ],
+
+  "source_code": {
+    "filename": "aws.query_cost_explorer.py",
+    "language": "python",
+    "git_loc": "",
+    "git_tag": ""
+  },
+
+  "execution_location": "client",
+  "execution_timeout":  30,
+
+  "input_schema": {
+    "parameters": [
+      {
+        "name":        "metric",
+        "type":        "string",
+        "required":    true,
+        "description": "AmortizedCost | UnblendedCost | BlendedCost — default AmortizedCost"
+      },
+      {
+        "name":        "service",
+        "type":        "string",
+        "required":    false,
+        "description": "full AWS service name e.g. 'Amazon EC2' — empty for all services"
+      },
+      {
+        "name":        "granularity",
+        "type":        "string",
+        "required":    true,
+        "description": "MONTHLY | DAILY | HOURLY — default MONTHLY"
+      },
+      {
+        "name":        "account-id",
+        "type":        "string",
+        "required":    false,
+        "description": "AWS account ID or empty"
+      },
+      {
+        "name":        "start",
+        "type":        "string",
+        "required":    true,
+        "description": "YYYY-MM-DDTHH:MM:SSZ — derive from query or default to 30 days ago"
+      },
+      {
+        "name":        "end",
+        "type":        "string",
+        "required":    true,
+        "description": "YYYY-MM-DDTHH:MM:SSZ — derive from query or default to today"
+      },
+      {
+        "name":        "tag",
+        "type":        "string",
+        "required":    false,
+        "description": "cost allocation tag filter or empty"
+      },
+      {
+        "name":        "region",
+        "type":        "string",
+        "required":    false,
+        "description": "AWS region or empty for all regions"
+      },
+      {
+        "name":        "profile",
+        "type":        "string",
+        "required":    true,
+        "description": "AWS profile name from Cloud Profile context"
+      }
+    ]
+  },
+
+  "output_schema_ref": "schemas/cost_report.yaml",
+  "safety_class":      "read_only",
+  "cacheable":         true,
+  "version":           "0.1.0",
+  "tenant_id":         null
+}

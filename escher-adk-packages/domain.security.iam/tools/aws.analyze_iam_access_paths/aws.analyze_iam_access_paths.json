@@ -1,0 +1,53 @@
+{
+  "tool_id":    "aws.analyze_iam_access_paths",
+  "name":       "AWS IAM Access Path Analyzer",
+  "description": "Map IAM role trust relationships, assume-role reachability, privilege escalation paths, and cross-account access risks.",
+  "tool_class": "iam_read",
+  "tool_type":  "readonly",
+
+  "domain":         ["security"],
+  "provider":       "aws",
+  "resource_types": [
+    "AWS::IAM::Role",
+    "AWS::IAM::Policy",
+    "AWS::IAM::User",
+    "AWS::STS::AssumedRole"
+  ],
+  "api_calls": [
+    "iam:ListRoles",
+    "iam:GetRole",
+    "iam:ListAttachedRolePolicies",
+    "iam:GetPolicy",
+    "iam:GetPolicyVersion",
+    "iam:ListRolePolicies",
+    "iam:GetRolePolicy",
+    "iam:SimulatePrincipalPolicy"
+  ],
+
+  "source_code": {
+    "filename": "aws.analyze_iam_access_paths.py",
+    "language": "python",
+    "git_loc":  "",
+    "git_tag":  ""
+  },
+
+  "execution_location": "client",
+  "execution_timeout":  45,
+
+  "input_schema": {
+    "parameters": [
+      {
+        "name":        "profile",
+        "type":        "string",
+        "required":    true,
+        "description": "AWS profile name from Cloud Profile context"
+      }
+    ]
+  },
+
+  "output_schema_ref": "schemas/iam_access_path_finding.yaml",
+  "safety_class":      "read_only",
+  "cacheable":         true,
+  "version":           "0.1.0",
+  "tenant_id":         null
+}

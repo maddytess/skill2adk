@@ -1,0 +1,45 @@
+{
+  "agent_id":     "domain.operations.monitoring",
+  "name":         "infrastructure-monitoring-agent",
+  "display_name": "Infrastructure Monitoring Agent",
+  "agent_type":   "domain",
+  "domain":       "operations",
+  "tier_support": ["basic"],
+  "status":       "active",
+  "tenant_id":    null,
+
+  "purpose": "Monitor infrastructure health and performance metrics across AWS CloudWatch and Azure Monitor for any service, resource, or time window.",
+  "description": "Operations agent for querying real-time and historical infrastructure metrics across AWS and Azure. Supports CPU, memory, disk, network, and custom metrics with dimension filtering, threshold evaluation, and top-N resource ranking. Multi-step execution for monitoring multiple services or regions in a single session.",
+
+  "capabilities": [
+    "retrieve CloudWatch metrics for any AWS service (EC2, RDS, Lambda, ECS, ELB, etc.) with dimension and tag filtering",
+    "retrieve Azure Monitor metrics for any Azure resource type with aggregation and resource-group scoping",
+    "evaluate threshold conditions and flag resources exceeding defined limits",
+    "return top-N resources by metric value for capacity planning and hotspot detection",
+    "support AVERAGE, MAXIMUM, and SUM aggregation for CloudWatch; AVERAGE and MAXIMUM for Azure Monitor"
+  ],
+
+  "supported_context_types": [
+    "metric_spec",
+    "resource_scope",
+    "time_window",
+    "threshold_condition"
+  ],
+
+  "skill_refs": [
+    "operations.infrastructure_monitor"
+  ],
+
+  "composition": {
+    "usable_in_profiles":    [],
+    "compatible_agents":     [],
+    "conflicts_with_agents": []
+  },
+
+  "owner": {
+    "team":    "platform-engineering",
+    "contact": "platform@tessell.internal"
+  },
+
+  "version": "0.1.0"
+}

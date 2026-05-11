@@ -1,0 +1,8 @@
+Anthropic_skills/
+Converted/
+skill2adk/__pycache__/
+.env
+.venv/
+__pycache__/
+*.egg-info/
+generated/

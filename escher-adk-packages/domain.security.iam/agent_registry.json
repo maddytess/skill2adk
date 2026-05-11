@@ -1,0 +1,45 @@
+{
+  "agent_id":     "domain.security.iam",
+  "name":         "iam-security-auditor",
+  "display_name": "IAM Security Audit Agent",
+  "agent_type":   "domain",
+  "domain":       "security",
+  "tier_support": ["basic", "advanced"],
+  "status":       "active",
+  "tenant_id":    null,
+
+  "purpose": "Audit IAM configurations, privilege escalation paths, and audit trail events across AWS and Azure.",
+  "description": "Security agent covering IAM trust chain analysis, privilege escalation path detection, comprehensive IAM misconfiguration auditing (MFA, access keys, policies, roles), and CloudTrail/Azure Activity Log event querying for who-did-what-when investigation.",
+
+  "capabilities": [
+    "analyze IAM role trust chains and privilege escalation paths across AWS and Azure",
+    "audit IAM users roles policies and access keys for security misconfigurations",
+    "query CloudTrail and Azure Activity Log for historical audit events"
+  ],
+
+  "supported_context_types": [
+    "iam_scope",
+    "resource_scope",
+    "account_scope",
+    "time_range"
+  ],
+
+  "skill_refs": [
+    "security.iam_access_path",
+    "security.iam_security_audit",
+    "security.cloudtrail_events"
+  ],
+
+  "composition": {
+    "usable_in_profiles":    [],
+    "compatible_agents":     [],
+    "conflicts_with_agents": []
+  },
+
+  "owner": {
+    "team":    "security-engineering",
+    "contact": "security@tessell.internal"
+  },
+
+  "version": "0.1.0"
+}

@@ -1,0 +1,86 @@
+{
+  "tool_id":    "azure.query_monitor_metrics",
+  "name":       "Azure Monitor Metrics Query",
+  "description": "Query Azure Monitor for infrastructure metrics with resource, aggregation, and threshold filtering.",
+  "tool_class": "metrics_read",
+  "tool_type":  "readonly",
+
+  "domain":         ["operations"],
+  "provider":       "azure",
+  "resource_types": [
+    "Microsoft.Monitor/metrics"
+  ],
+  "api_calls": [
+    "Microsoft.Insights/metrics/read",
+    "Microsoft.Insights/metricDefinitions/read"
+  ],
+
+  "source_code": {
+    "filename": "azure.query_monitor_metrics.py",
+    "language": "python",
+    "git_loc":  "",
+    "git_tag":  ""
+  },
+
+  "execution_location": "client",
+  "execution_timeout":  30,
+
+  "input_schema": {
+    "parameters": [
+      {
+        "name":        "service",
+        "type":        "string",
+        "required":    true,
+        "description": "Azure resource type e.g. vm, sql, functions, aks"
+      },
+      {
+        "name":        "resource-group",
+        "type":        "string",
+        "required":    false,
+        "description": "Azure resource group name or empty"
+      },
+      {
+        "name":        "metric",
+        "type":        "string",
+        "required":    true,
+        "description": "Azure metric name e.g. Percentage CPU, Available Memory Bytes"
+      },
+      {
+        "name":        "resource",
+        "type":        "string",
+        "required":    false,
+        "description": "specific resource name or empty for all in group"
+      },
+      {
+        "name":        "aggregation",
+        "type":        "string",
+        "required":    true,
+        "description": "Average | Maximum — default Average"
+      },
+      {
+        "name":        "duration",
+        "type":        "string",
+        "required":    true,
+        "description": "time window e.g. 24h, 7d — default 24h"
+      },
+      {
+        "name":        "threshold",
+        "type":        "string",
+        "required":    false,
+        "description": "threshold condition e.g. >80 — empty if no threshold"
+      },
+      {
+        "name":        "subscription-name",
+        "type":        "string",
+        "required":    false,
+        "description": "Azure subscription name or empty"
+      }
+    ]
+  },
+
+  "output_schema_ref": "schemas/metric_report.yaml",
+  "safety_class":      "read_only",
+  "cacheable":         false,
+  "version":           "0.1.0",
+  "tenant_id":         null
+}

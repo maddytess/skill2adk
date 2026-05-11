@@ -1,0 +1,51 @@
+{
+  "tool_id":    "azure.run_soc2_audit",
+  "name":       "Azure SOC 2 Compliance Audit",
+  "description": "Evaluate Azure infrastructure against SOC 2 Trust Service Criteria and return a structured compliance report.",
+  "tool_class": "compliance_read",
+  "tool_type":  "readonly",
+
+  "domain":         ["compliance"],
+  "provider":       "azure",
+  "resource_types": [
+    "Microsoft.Authorization/roleAssignments",
+    "Microsoft.KeyVault/vaults",
+    "Microsoft.Security/securityContacts",
+    "Microsoft.Storage/storageAccounts",
+    "Microsoft.Insights/diagnosticSettings"
+  ],
+  "api_calls": [
+    "Microsoft.Authorization/roleAssignments/read",
+    "Microsoft.KeyVault/vaults/read",
+    "Microsoft.Security/securityContacts/read",
+    "Microsoft.Storage/storageAccounts/read",
+    "Microsoft.Insights/diagnosticSettings/read"
+  ],
+
+  "source_code": {
+    "filename": "azure.run_soc2_audit.py",
+    "language": "python",
+    "git_loc":  "",
+    "git_tag":  ""
+  },
+
+  "execution_location": "client",
+  "execution_timeout":  60,
+
+  "input_schema": {
+    "parameters": [
+      {
+        "name":        "subscription-name",
+        "type":        "string",
+        "required":    true,
+        "description": "Azure profile name from Cloud Profile context"
+      }
+    ]
+  },
+
+  "output_schema_ref": "schemas/compliance_report.yaml",
+  "safety_class":      "read_only",
+  "cacheable":         true,
+  "version":           "0.1.0",
+  "tenant_id":         null
+}

@@ -1,0 +1,55 @@
+{
+  "tool_id":    "aws.run_hipaa_audit",
+  "name":       "AWS HIPAA Security Rule Audit",
+  "description": "Evaluate AWS infrastructure against HIPAA Security Rule safeguards for PHI data protection and return a structured compliance report.",
+  "tool_class": "compliance_read",
+  "tool_type":  "readonly",
+
+  "domain":         ["compliance"],
+  "provider":       "aws",
+  "resource_types": [
+    "AWS::IAM::User",
+    "AWS::S3::Bucket",
+    "AWS::RDS::DBInstance",
+    "AWS::KMS::Key",
+    "AWS::CloudTrail::Trail",
+    "AWS::EC2::SecurityGroup",
+    "AWS::CloudWatch::LogGroup"
+  ],
+  "api_calls": [
+    "iam:ListUsers",
+    "s3:GetBucketEncryption",
+    "rds:DescribeDBInstances",
+    "kms:ListKeys",
+    "cloudtrail:DescribeTrails",
+    "ec2:DescribeSecurityGroups",
+    "logs:DescribeLogGroups"
+  ],
+
+  "source_code": {
+    "filename": "aws.run_hipaa_audit.py",
+    "language": "python",
+    "git_loc":  "",
+    "git_tag":  ""
+  },
+
+  "execution_location": "client",
+  "execution_timeout":  60,
+
+  "input_schema": {
+    "parameters": [
+      {
+        "name":        "profile",
+        "type":        "string",
+        "required":    true,
+        "description": "AWS profile name from Cloud Profile context"
+      }
+    ]
+  },
+
+  "output_schema_ref": "schemas/compliance_report.yaml",
+  "safety_class":      "read_only",
+  "cacheable":         true,
+  "version":           "0.1.0",
+  "tenant_id":         null
+}

@@ -1,0 +1,103 @@
+{
+  "skill_id":       "security.iam_access_path",
+  "display_name":   "IAM Access Path Analyzer",
+  "owner_agent_id": "domain.security.iam",
+  "capability_id":  "analyze_iam_access_paths",
+  "domain":         "security",
+  "tier":           "advanced",
+  "status":         "active",
+  "tenant_id":      null,
+
+  "purpose":     "Analyze IAM trust chains and privilege escalation paths across AWS or Azure to surface cross-account access risks.",
+  "description": "Maps IAM trust relationships, role-chaining paths, and privilege escalation vectors. Use for: IAM trust chain, role chaining, privilege escalation paths, cross-account access risks, assume-role reachability, Azure RBAC privilege escalation. NOT for general IAM security audit (use iam_security_audit for that).",
+
+  "capabilities": [
+    "map IAM role trust relationships and assume-role reachability across an AWS account",
+    "detect privilege escalation paths through IAM role chaining",
+    "identify cross-account access risks and transitive trust vulnerabilities",
+    "analyze Azure RBAC role assignments for privilege escalation vectors"
+  ],
+
+  "context_descriptions": [
+    "IAM trust graph — all IAM roles, trust policies, and assume-role relationships",
+    "privilege escalation paths — role chaining sequences that elevate permissions",
+    "cross-account trust — external account IDs that can assume roles in this account",
+    "Azure RBAC assignments — role definitions and managed identity bindings"
+  ],
+
+  "supported_context_types": [
+    "iam_trust_graph",
+    "privilege_escalation_inventory",
+    "account_scope"
+  ],
+
+  "tool_affinity": {
+    "allowed_tool_classes": ["iam_read"],
+    "preferred_tool_tags":  ["iam", "trust", "role", "privilege", "escalation", "cross-account", "azure-rbac"],
+    "execution_locations":  ["client"]
+  },
+
+  "context": {
+    "merge_strategy":      "union",
+    "dedupe_keys":         ["account_scope"],
+    "max_parallel":        2,
+    "on_missing_required": "request_more"
+  },
+
+  "execution_plan": {
+    "steps": [
+      {
+        "step_id":      "fetch_iam_trust_graph",
+        "context_type": "iam_trust_graph",
+        "tool_class":   "iam_read",
+        "depends_on":   [],
+        "required":     true,
+        "on_failure":   "stop"
+      },
+      {
+        "step_id":      "analyze_escalation_paths",
+        "context_type": "privilege_escalation_inventory",
+        "tool_class":   "iam_read",
+        "depends_on":   ["fetch_iam_trust_graph"],
+        "required":     true,
+        "on_failure":   "stop"
+      }
+    ],
+    "on_partial_failure": "fail"
+  },
+
+  "output_type":       "finding",
+  "output_schema_ref": "schemas/iam_access_path_finding.yaml",
+
+  "client_action_type": "iam_access_path",
+
+  "tool_ids": [
+    "aws.analyze_iam_access_paths",
+    "azure.analyze_rbac_paths"
+  ],
+
+  "artifact_effects": {
+    "can_create": ["finding"],
+    "can_update": [],
+    "can_enrich": ["triage"]
+  },
+
+  "action_semantics": {
+    "can_request_execution":            false,
+    "can_generate_plan_fragments":      true,
+    "can_generate_bundle_hints":        false,
+    "can_generate_playbook_candidates": true
+  },
+
+  "safety": {
+    "safety_class":              "advisory",
+    "requires_human_review_for": []
+  },
+
+  "evidence": {
+    "emits_rationale":  true,
+    "emits_confidence": true
+  },
+
+  "version": "0.1.0"
+}

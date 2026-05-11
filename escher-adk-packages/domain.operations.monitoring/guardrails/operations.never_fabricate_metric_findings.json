@@ -1,0 +1,62 @@
+{
+  "guardrail_id":   "operations.never_fabricate_metric_findings",
+  "name":           "Never fabricate infrastructure metric findings",
+  "scope":          "domain",
+  "skill_id":       null,
+  "owner_agent_id": null,
+  "domain":         "operations",
+  "tenant_id":      null,
+
+  "rules": [
+    {
+      "rule_id":     "no_cache_for_metric_queries",
+      "description": "Both aws.query_cloudwatch_metrics and azure.query_monitor_metrics are marked cacheable: false. Metric results must always reflect a live API call at query time. During an active incident, a stale cached metric could show a resource as healthy when it has since degraded — for example, a CPU spike that began after the cache was populated would be invisible. Never serve a previously retrieved metric result as the current infrastructure state.",
+      "enforcement": "hard",
+      "action":      "block"
+    },
+    {
+      "rule_id":     "threshold_is_pointintime_not_alarm_state",
+      "description": "The threshold parameter in aws.query_cloudwatch_metrics performs a point-in-time comparison against the metric value returned by cloudwatch:GetMetricStatistics. It is not the CloudWatch alarm state managed by cloudwatch:DescribeAlarms, which reflects a sustained breach over a configured evaluation period. A single metric value exceeding a threshold at query time does not mean an alarm has fired or an SLA is breached. Never report a threshold comparison result as an active alarm or ongoing incident without separately checking CloudWatch alarm state.",
+      "enforcement": "hard",
+      "action":      "block"
+    },
+    {
+      "rule_id":     "timeout_is_not_healthy_signal",
+      "description": "Both tools have execution_timeout: 30 seconds. The skill's on_partial_failure is set to fail, meaning a timeout returns no data. An empty or failed metric result due to timeout must not be interpreted as 'no issues found' or 'metrics within normal range.' Report that the query did not complete within the timeout window and that infrastructure health status is unknown for the queried resource.",
+      "enforcement": "hard",
+      "action":      "block"
+    },
+    {
+      "rule_id":     "empty_metric_is_not_healthy_signal",
+      "description": "When metric is omitted in aws.query_cloudwatch_metrics, cloudwatch:ListMetrics returns all published metrics for the namespace. If a specific metric is absent in the result, it means CloudWatch has no data points for that metric — the resource likely never published it, not that the resource is healthy. Similarly, if Azure Monitor returns empty data for a metric, it may mean the metric is unsupported for the selected resource type or the aggregation type is incompatible. Do not interpret the absence of metric data as a healthy or baseline state.",
+      "enforcement": "hard",
+      "action":      "block"
+    },
+    {
+      "rule_id":     "stats_aggregation_cross_provider_mismatch",
+      "description": "aws.query_cloudwatch_metrics supports stats: Average, Maximum, and Sum. azure.query_monitor_metrics only supports aggregation: Average and Maximum — Sum is not available. When comparing a metric across AWS and Azure (e.g. total request count, total errors), a Sum-based AWS result cannot be matched to any Azure aggregation. Cross-provider metric comparisons must use only Average or Maximum, and both queries must use the same aggregation type. Never present a Sum-aggregated AWS value alongside an Azure metric as a comparable pair.",
+      "enforcement": "hard",
+      "action":      "block"
+    },
+    {
+      "rule_id":     "cross_provider_duration_alignment",
+      "description": "aws.query_cloudwatch_metrics defaults duration to 1 hour when not specified. azure.query_monitor_metrics requires duration explicitly and defaults to 24h. When presenting a side-by-side metric comparison across AWS and Azure — for example, CPU utilization of AWS EC2 vs Azure VM — verify that both queries covered the exact same time window. Comparing a 1-hour AWS average to a 24-hour Azure average produces a misleading result and must not be presented as an equivalent comparison.",
+      "enforcement": "soft",
+      "action":      "warn"
+    },
+    {
+      "rule_id":     "aws_region_scope_disclosure",
+      "description": "CloudWatch metrics are region-scoped. When region is not specified in aws.query_cloudwatch_metrics, the tool queries the default region only. Results do not reflect infrastructure in other regions. Do not report a metric as globally absent or declare a service globally healthy based on a single-region query. If the user asks about multi-region health, separate tool invocations per region are required.",
+      "enforcement": "soft",
+      "action":      "warn"
+    },
+    {
+      "rule_id":     "top_n_does_not_confirm_others_healthy",
+      "description": "The top parameter in aws.query_cloudwatch_metrics limits results to the N resources with the highest metric value. Resources outside the top-N were not evaluated — they were simply not returned. Do not summarize a top-N result as 'only these N resources have elevated metrics' or imply the remaining resources are within threshold. The health status of non-returned resources is unknown, not confirmed normal.",
+      "enforcement": "soft",
+      "action":      "warn"
+    }
+  ],
+
+  "version": "0.1.0"
+}

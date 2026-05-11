@@ -1,0 +1,91 @@
+{
+  "tool_id":    "azure.query_activity_log",
+  "name":       "Azure Activity Log Query",
+  "description": "Query Azure Activity Log for resource operation history — who did what, when, with resource provider and subscription scoping.",
+  "tool_class": "audit_read",
+  "tool_type":  "readonly",
+
+  "domain":         ["security"],
+  "provider":       "azure",
+  "resource_types": [
+    "Microsoft.Insights/ActivityLog"
+  ],
+  "api_calls": [
+    "Microsoft.Insights/eventtypes/values/read"
+  ],
+
+  "source_code": {
+    "filename": "azure.query_activity_log.py",
+    "language": "python",
+    "git_loc":  "",
+    "git_tag":  ""
+  },
+
+  "execution_location": "client",
+  "execution_timeout":  30,
+
+  "input_schema": {
+    "parameters": [
+      {
+        "name":        "resource_providers",
+        "type":        "string",
+        "required":    false,
+        "description": "Azure resource provider e.g. Microsoft.Compute — empty for all"
+      },
+      {
+        "name":        "operation_name",
+        "type":        "string",
+        "required":    false,
+        "description": "operation type e.g. write, delete, action — empty for all"
+      },
+      {
+        "name":        "caller",
+        "type":        "string",
+        "required":    false,
+        "description": "user or service principal who performed the action — empty for all"
+      },
+      {
+        "name":        "resource_group",
+        "type":        "string",
+        "required":    false,
+        "description": "Azure resource group name — empty for all"
+      },
+      {
+        "name":        "start_time",
+        "type":        "string",
+        "required":    true,
+        "description": "YYYY-MM-DD — derive from query or default to 30 days ago"
+      },
+      {
+        "name":        "end_time",
+        "type":        "string",
+        "required":    true,
+        "description": "YYYY-MM-DD — derive from query or default to today"
+      },
+      {
+        "name":        "status",
+        "type":        "string",
+        "required":    false,
+        "description": "operation status e.g. Failed, Succeeded — empty for all"
+      },
+      {
+        "name":        "correlation_id",
+        "type":        "string",
+        "required":    false,
+        "description": "correlation ID for tracing a specific operation — empty for none"
+      },
+      {
+        "name":        "subscription-name",
+        "type":        "string",
+        "required":    false,
+        "description": "Azure subscription name or empty"
+      }
+    ]
+  },
+
+  "output_schema_ref": "schemas/audit_event_report.yaml",
+  "safety_class":      "read_only",
+  "cacheable":         false,
+  "version":           "0.1.0",
+  "tenant_id":         null
+}

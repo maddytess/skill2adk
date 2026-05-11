@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "skill2adk"
+version = "0.1.0"
+description = "Convert agentskills.io / Anthropic SKILL.md skills into Escher ADK packages."
+requires-python = ">=3.10"
+dependencies = [
+    "anthropic>=0.100.0",
+    "pydantic>=2.13",
+    "pyyaml>=6.0",
+    "python-dotenv>=1.0",
+]
+
+[project.scripts]
+skill2adk = "skill2adk.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["skill2adk*"]

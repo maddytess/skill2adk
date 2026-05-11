@@ -1,0 +1,54 @@
+{
+  "tool_id":    "aws.run_gdpr_audit",
+  "name":       "AWS GDPR Compliance Audit",
+  "description": "Evaluate AWS infrastructure against GDPR data protection requirements for personal data and privacy, returning a structured compliance report.",
+  "tool_class": "compliance_read",
+  "tool_type":  "readonly",
+
+  "domain":         ["compliance"],
+  "provider":       "aws",
+  "resource_types": [
+    "AWS::S3::Bucket",
+    "AWS::RDS::DBInstance",
+    "AWS::KMS::Key",
+    "AWS::IAM::Role",
+    "AWS::CloudTrail::Trail",
+    "AWS::CloudWatch::LogGroup"
+  ],
+  "api_calls": [
+    "s3:GetBucketEncryption",
+    "s3:GetBucketLogging",
+    "rds:DescribeDBInstances",
+    "kms:ListKeys",
+    "iam:ListRoles",
+    "cloudtrail:DescribeTrails",
+    "logs:DescribeLogGroups"
+  ],
+
+  "source_code": {
+    "filename": "aws.run_gdpr_audit.py",
+    "language": "python",
+    "git_loc":  "",
+    "git_tag":  ""
+  },
+
+  "execution_location": "client",
+  "execution_timeout":  60,
+
+  "input_schema": {
+    "parameters": [
+      {
+        "name":        "profile",
+        "type":        "string",
+        "required":    true,
+        "description": "AWS profile name from Cloud Profile context"
+      }
+    ]
+  },
+
+  "output_schema_ref": "schemas/compliance_report.yaml",
+  "safety_class":      "read_only",
+  "cacheable":         true,
+  "version":           "0.1.0",
+  "tenant_id":         null
+}

@@ -1,0 +1,62 @@
+{
+  "tool_id":    "aws.run_pci_dss_audit",
+  "name":       "AWS PCI-DSS v4.0 Compliance Audit",
+  "description": "Evaluate AWS against PCI-DSS v4.0 covering network security, cardholder data protection, access control, logging, and vulnerability management.",
+  "tool_class": "compliance_read",
+  "tool_type":  "readonly",
+
+  "domain":         ["compliance"],
+  "provider":       "aws",
+  "resource_types": [
+    "AWS::EC2::SecurityGroup",
+    "AWS::EC2::NetworkAcl",
+    "AWS::EC2::VPC",
+    "AWS::S3::Bucket",
+    "AWS::KMS::Key",
+    "AWS::IAM::User",
+    "AWS::CloudTrail::Trail",
+    "AWS::GuardDuty::Detector",
+    "AWS::WAFv2::WebACL",
+    "AWS::ElasticLoadBalancingV2::LoadBalancer"
+  ],
+  "api_calls": [
+    "ec2:DescribeSecurityGroups",
+    "ec2:DescribeNetworkAcls",
+    "ec2:DescribeVpcs",
+    "s3:GetBucketEncryption",
+    "kms:ListKeys",
+    "iam:ListUsers",
+    "iam:GetAccountPasswordPolicy",
+    "cloudtrail:DescribeTrails",
+    "guardduty:ListDetectors",
+    "wafv2:ListWebACLs",
+    "elasticloadbalancing:DescribeLoadBalancers"
+  ],
+
+  "source_code": {
+    "filename": "aws.run_pci_dss_audit.py",
+    "language": "python",
+    "git_loc":  "",
+    "git_tag":  ""
+  },
+
+  "execution_location": "client",
+  "execution_timeout":  60,
+
+  "input_schema": {
+    "parameters": [
+      {
+        "name":        "profile",
+        "type":        "string",
+        "required":    true,
+        "description": "AWS profile name from Cloud Profile context"
+      }
+    ]
+  },
+
+  "output_schema_ref": "schemas/pci_dss_report.yaml",
+  "safety_class":      "read_only",
+  "cacheable":         true,
+  "version":           "0.1.0",
+  "tenant_id":         null
+}

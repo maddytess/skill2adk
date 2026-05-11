@@ -1,0 +1,9 @@
+Metadata-Version: 2.4
+Name: skill2adk
+Version: 0.1.0
+Summary: Convert agentskills.io / Anthropic SKILL.md skills into Escher ADK packages.
+Requires-Python: >=3.10
+Requires-Dist: anthropic>=0.100.0
+Requires-Dist: pydantic>=2.13
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: python-dotenv>=1.0
